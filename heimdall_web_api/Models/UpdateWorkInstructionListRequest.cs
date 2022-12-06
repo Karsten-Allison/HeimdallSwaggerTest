@@ -6,6 +6,6 @@ namespace heimdall_web_api.Models
 {
     public class UpdateWorkInstructionListRequest
     {
-        public List<Instruction> InstructionList { get; set; }
+        public List<string> InstructionList { get; set; }
     }
 }

@@ -10,23 +10,14 @@ namespace heimdall_web_api.Data
 {
     public class WorkInstructionSet
     {
-        [Key][Required] 
-        public Guid Id { get; set; }
+        public int Id { get; set; }
+        [Required]
 
         public string Title { get; set; }
 
         public string Description { get; set; }
 
-        public List<Instruction> InstructionList { get; set; }
+        public string InstructionObject { get; set; }
     }
 
-    public class Instruction
-    {
-        [Key][Required] 
-        public Guid Id { get; set;}
-
-        public string Text { get; set; }
-
-
-    }
 }

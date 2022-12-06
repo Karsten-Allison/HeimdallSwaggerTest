@@ -25,8 +25,8 @@ namespace heimdall_web_api.Controllers
         }
 
         [HttpGet]
-        [Route("{id:guid}")]
-        public async Task<IActionResult> GetWorkInstructionSet([FromRoute] Guid id)
+        [Route("{id}")]
+        public async Task<IActionResult> GetWorkInstructionSet([FromRoute] int id)
         {
             var workInSet = await context.workInstructionSets.FindAsync(id);
 
@@ -43,10 +43,10 @@ namespace heimdall_web_api.Controllers
         {
             var workInstructionSet = new WorkInstructionSet()
             {
-                Id = Guid.NewGuid(),
+
                 Title = addWorkInstructionRequest.Title,
                 Description = addWorkInstructionRequest.Description,
-                InstructionList = addWorkInstructionRequest.InstructionList,
+                InstructionObject = addWorkInstructionRequest.InstructionObject,
             };
 
             await context.workInstructionSets.AddAsync(workInstructionSet);
@@ -54,10 +54,10 @@ namespace heimdall_web_api.Controllers
 
             return Ok(workInstructionSet);
         }
-
+        
         [HttpPut]
-        [Route("{id:guid}")]
-        public async Task<IActionResult> UpdateInstructionSet([FromRoute] Guid id, UpdateWorkInstructionRequest updateWorkInstructionRequest)
+        [Route("{id}")]
+        public async Task<IActionResult> UpdateInstructionSet([FromRoute] int id, UpdateWorkInstructionRequest updateWorkInstructionRequest)
         {
             var workInSet = await context.workInstructionSets.FindAsync(id);
 
@@ -65,7 +65,7 @@ namespace heimdall_web_api.Controllers
             {
                 workInSet.Title = updateWorkInstructionRequest.Title;
                 workInSet.Description = updateWorkInstructionRequest.Description;
-                workInSet.InstructionList = updateWorkInstructionRequest.InstructionList;
+                workInSet.InstructionObject = updateWorkInstructionRequest.InstructionObject;
 
                 await context.SaveChangesAsync();
 
@@ -77,8 +77,8 @@ namespace heimdall_web_api.Controllers
         }
 
         [HttpDelete]
-        [Route("{id:guid}")]
-        public async Task<IActionResult> DeleteWorkInstructionSet([FromRoute] Guid id)
+        [Route("{id}")]
+        public async Task<IActionResult> DeleteWorkInstructionSet(int id)
         {
             var workInSet = await context.workInstructionSets.FindAsync(id);
 
@@ -91,6 +91,6 @@ namespace heimdall_web_api.Controllers
 
             return NotFound();
         }
-
+        
     }
 }

@@ -14,9 +14,7 @@ namespace heimdall_web_api.Data
         {
         }
 
+
         public DbSet<WorkInstructionSet> workInstructionSets { get; set; }
-
-        public DbSet<Instruction> workInstructions { get; set; }
-
     }
 }
