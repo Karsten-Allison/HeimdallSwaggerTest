@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\heimdall_web_api.props" />
+</Project>
