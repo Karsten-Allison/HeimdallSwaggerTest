@@ -1,9 +1,9 @@
-﻿using heimdall_web_api.Data;
+﻿using Heimdall.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace heimdall_web_api.Models
 {
-    public class AddWorkInstructionRequest
+    public record AddWorkInstructionRequest
     {
         public string Title { get; set; }
 

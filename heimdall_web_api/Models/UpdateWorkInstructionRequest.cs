@@ -1,10 +1,10 @@
-﻿using heimdall_web_api.Data;
+﻿using Heimdall.Data;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
 namespace heimdall_web_api.Models
 {
-    public class UpdateWorkInstructionRequest
+    public record UpdateWorkInstructionRequest
     {
         public string Title { get; set; }
 

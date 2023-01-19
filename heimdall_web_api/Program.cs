@@ -1,4 +1,4 @@
-using heimdall_web_api.Data;
+using Heimdall.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
