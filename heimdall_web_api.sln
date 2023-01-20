@@ -5,7 +5,16 @@ VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "heimdall_web_api", "heimdall_web_api\heimdall_web_api.csproj", "{40D2B03A-9B33-44FF-B733-F2191BEB0DFE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Heimdall.Data", "Heimdall.Data\Heimdall.Data.csproj", "{DCE479C2-D474-41F8-86AA-9E639D337F65}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Heimdall.Data", "Heimdall.Data\Heimdall.Data.csproj", "{DCE479C2-D474-41F8-86AA-9E639D337F65}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Heimdall.Logic", "Heimdall.Logic\Heimdall.Logic.csproj", "{3E140E2D-41BC-45B4-93EE-C7448B1B288C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E7C5328D-B548-48A8-8764-A2D0DC6928E7}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		LICENSE.md = LICENSE.md
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +30,10 @@ Global
 		{DCE479C2-D474-41F8-86AA-9E639D337F65}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DCE479C2-D474-41F8-86AA-9E639D337F65}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DCE479C2-D474-41F8-86AA-9E639D337F65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E140E2D-41BC-45B4-93EE-C7448B1B288C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E140E2D-41BC-45B4-93EE-C7448B1B288C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E140E2D-41BC-45B4-93EE-C7448B1B288C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E140E2D-41BC-45B4-93EE-C7448B1B288C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
