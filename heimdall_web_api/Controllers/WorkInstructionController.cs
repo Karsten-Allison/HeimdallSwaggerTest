@@ -12,11 +12,11 @@ namespace heimdall_web_api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class WorkInstructionController : Controller
+    public class WorkInstructionsController : Controller
     {
         private readonly IWorkInstructionLogic _logic;
 
-        public WorkInstructionController(IWorkInstructionLogic logic)
+        public WorkInstructionsController(IWorkInstructionLogic logic)
         {
             _logic = logic;
         }
