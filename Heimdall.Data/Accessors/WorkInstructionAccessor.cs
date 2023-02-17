@@ -27,10 +27,9 @@ namespace Heimdall.Data.Accessors
         {
             var workInstruction = new WorkInstruction()
             {
-
                 Title = command.Title,
                 Description = command.Description,
-                InstructionObject = command.InstructionObject,
+                InstructionList = command.InstructionList,
             };
             try
             {
@@ -61,14 +60,18 @@ namespace Heimdall.Data.Accessors
 
         public async Task<OneOf<WorkInstructionsRead, WorkInstructionNotFound>> GetAllAsync()
         {
-            WorkInstruction[] databaseInstructions = (await _context.WorkInstructions.ToArrayAsync()) ?? Array.Empty<WorkInstruction>();
+            WorkInstruction[] databaseInstructions = (await _context.WorkInstructions
+                .Include(workinstruction => workinstruction.InstructionList).ToArrayAsync()) ?? Array.Empty<WorkInstruction>();
             
             return new WorkInstructionsRead(databaseInstructions);
         }
 
         public async Task<OneOf<WorkInstructionRead, WorkInstructionNotFound>> GetAsync(ReadWorkInstruction command)
         {
-            WorkInstruction? workInstruction = await _context.WorkInstructions.FindAsync(command.Id);
+            WorkInstruction? workInstruction = await _context.WorkInstructions
+                .Include(workinstruction => workinstruction.InstructionList)
+                .FirstOrDefaultAsync(workinstruction => workinstruction.Id == command.Id);
+
             if (workInstruction is null)
             {
                 return new WorkInstructionNotFound(command.Id);
@@ -96,9 +99,9 @@ namespace Heimdall.Data.Accessors
             {
                 workInSet.Description = command.Description;
             }
-            if (command.InstructionObject is not null)
+            if (command.InstructionList is not null)
             {
-                workInSet.InstructionObject = command.InstructionObject;
+                workInSet.InstructionList = command.InstructionList;
             }
 
             await _context.SaveChangesAsync();

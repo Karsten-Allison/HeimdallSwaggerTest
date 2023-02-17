@@ -1,4 +1,5 @@
 ﻿using Heimdall.Data;
+using Heimdall.Logic.WorkInstructions.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace heimdall_web_api.Models
@@ -9,6 +10,6 @@ namespace heimdall_web_api.Models
 
         public string Description { get; set; }
 
-        public string InstructionObject { get; set; }
+        public List<Instruction> InstructionList { get; set; }
     }
 }

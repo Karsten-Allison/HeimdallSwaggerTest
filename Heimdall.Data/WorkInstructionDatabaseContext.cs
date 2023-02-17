@@ -18,6 +18,8 @@ namespace Heimdall.Data
         // RLP - use PascalCasing for entities. The word "Set" isn't needed to define a set.
         public DbSet<WorkInstruction> WorkInstructions { get; set; }
 
+        public DbSet<Instruction> Instructions { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // RLP - There way will load all configurations in the entire assembly without having to specify them individually.

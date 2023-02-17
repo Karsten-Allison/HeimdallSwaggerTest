@@ -18,13 +18,11 @@ namespace Heimdall.Data.EntityConfigurations
             builder.HasKey(x => x.Id);
 
             builder.Property(x => x.Title)
-                .IsRequired()
-                .HasMaxLength(20);
-            //I just wanted to see if this worked, i get response 500 errors when the title is too long; so it does.
+                .IsRequired();
 
             builder.Property(x => x.Description);
 
-            builder.Property(x => x.InstructionObject);
+            // turns out that InstructionList cant be configured as a property since its apparently configured as a "navigation"
         }
     }
 }

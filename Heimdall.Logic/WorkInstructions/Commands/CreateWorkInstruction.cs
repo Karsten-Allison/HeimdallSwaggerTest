@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Heimdall.Logic.Core;
+using Heimdall.Logic.WorkInstructions.Entities;
 
 namespace Heimdall.Logic.WorkInstructions.Commands
 {
@@ -12,6 +13,6 @@ namespace Heimdall.Logic.WorkInstructions.Commands
     /// </summary>
     /// <param name="Title"></param>
     /// <param name="Description"></param>
-    /// <param name="InstructionObject"></param>
-    public record CreateWorkInstruction(string Title, string Description, string InstructionObject) : ICommand;
+    /// <param name="InstructionList"></param>
+    public record CreateWorkInstruction(string Title, string Description, List<Instruction> InstructionList) : ICommand;
 }
