@@ -43,14 +43,14 @@ namespace Heimdall.Data.Accessors
             }
         }
 
-        public async Task<OneOf<InstructionCreated, CreateInstructionFailed>> AddAsyncInstruction(CreateInstruction command, int ForeignKeyID)
+        public async Task<OneOf<InstructionCreated, CreateInstructionFailed>> AddAsyncInstruction(CreateInstruction command)
         {
             var Instruction = new Instruction()
             {
                 InstructionText = command.InstructionText,
                 InstructionImage = command.InstructionImage,
                 InstructionCordinates = command.InstructionCordinates,
-                InstructionForeignKey = ForeignKeyID
+                InstructionForeignKey = command.ForeignKeyId
             };
             try
             {
@@ -77,6 +77,28 @@ namespace Heimdall.Data.Accessors
             await _context.SaveChangesAsync();
 
             return new WorkInstructionDeleted(command.Id);
+        }
+
+        public async Task<OneOf<InstructionDeleted, DeleteInstructionFailed>> DeleteAsyncInstruction(DeleteInstruction command)
+        {
+            var workInstruction = await _context.WorkInstructions.FindAsync(command.Id);
+
+            if (workInstruction is null)
+            {
+                return new DeleteInstructionFailed(command, $"Could not find work instruction with id {command.Id}");
+            }
+
+            var Instruction = await _context.Instructions.FindAsync(command.InstructionID);
+
+            if (Instruction is null)
+            {
+                return new DeleteInstructionFailed(command, $"Could not find instruction with id {command.InstructionID}");
+            }
+
+            _context.Remove(Instruction);
+            await _context.SaveChangesAsync();
+
+            return new InstructionDeleted(command.InstructionID);
         }
 
         public async Task<OneOf<WorkInstructionsRead, WorkInstructionNotFound>> GetAllAsync()
@@ -129,5 +151,41 @@ namespace Heimdall.Data.Accessors
 
             return new WorkInstructionUpdated(workInSet);
         }
+
+        public async Task<OneOf<InstructionUpdated, UpdateInstructionFailed>> UpdateAsyncInstruction(UpdateInstruction command)
+        {
+            var workInstruction = await _context.WorkInstructions.FindAsync(command.Id);
+
+            if (workInstruction is null)
+            {
+                return new UpdateInstructionFailed(command, $"Could not find work instruction with id {command.Id}");
+            }
+
+            var Instruction = await _context.Instructions.FindAsync(command.InstructionID);
+
+            if (Instruction is null)
+            {
+                return new UpdateInstructionFailed(command, $"Could not find instruction with id {command.InstructionID}");
+            }
+
+            if(command.InstructionText is not null)
+            {
+                Instruction.InstructionText = command.InstructionText;
+            }
+            if(command.InstructionImage is not null)
+            {
+                Instruction.InstructionImage = command.InstructionImage;
+            }
+            if(command.InstructionCordinates is not null)
+            {
+                Instruction.InstructionCordinates = command.InstructionCordinates;
+            }
+
+
+            await _context.SaveChangesAsync();
+
+            return new InstructionUpdated(Instruction);
+        }
+
     }
 }

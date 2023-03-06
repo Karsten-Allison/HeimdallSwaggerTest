@@ -15,16 +15,24 @@ namespace Heimdall.Logic.WorkInstructions
     // behaviors that must exist, not how they work. That detail be left to the Data assembly.
     public interface IWorkInstructionAccessor
     {
+        // For WorkInstruction's
+
         Task<OneOf<WorkInstructionRead, WorkInstructionNotFound>> GetAsync(ReadWorkInstruction command);
 
         Task<OneOf<WorkInstructionsRead, WorkInstructionNotFound>> GetAllAsync();
 
         Task<OneOf<WorkInstructionCreated, CreateWorkInstructionFailed>> AddAsync(CreateWorkInstruction command);
 
-        Task<OneOf<InstructionCreated, CreateInstructionFailed>> AddAsyncInstruction(CreateInstruction command, int ForeignKeyID);
-
         Task<OneOf<WorkInstructionUpdated, UpdateWorkInstructionFailed>> UpdateAsync(UpdateWorkInstruction command);
 
         Task<OneOf<WorkInstructionDeleted, DeleteWorkInstructionFailed>> DeleteAsync(DeleteWorkInstruction command);
+
+        // For Instruction's
+
+        Task<OneOf<InstructionDeleted, DeleteInstructionFailed>> DeleteAsyncInstruction(DeleteInstruction command);
+
+        Task<OneOf<InstructionCreated, CreateInstructionFailed>> AddAsyncInstruction(CreateInstruction command);
+
+        Task<OneOf<InstructionUpdated, UpdateInstructionFailed>> UpdateAsyncInstruction(UpdateInstruction command);
     }
 }

@@ -25,11 +25,11 @@ namespace Heimdall.Data.EntityConfigurations
             builder.Property(x => x.InstructionCordinates);
 
             builder
-                .HasOne<WorkInstruction>() //This broke evrything when i had it set as (x => x.)
+                .HasOne<WorkInstruction>()
                 .WithMany(x => x.InstructionList)
                 .HasForeignKey(x => x.InstructionForeignKey)
                 .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade); // Is this a good idea????
+                .OnDelete(DeleteBehavior.Cascade); 
                 
         }
     }

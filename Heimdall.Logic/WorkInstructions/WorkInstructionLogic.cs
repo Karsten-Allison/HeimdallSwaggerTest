@@ -101,15 +101,43 @@ namespace Heimdall.Logic.WorkInstructions
             return result;
         }
 
-        public async Task<OneOf<InstructionCreated, CreateInstructionFailed>> AddAsyncInstruction(CreateInstruction command, int ForeignKeyID)
+        public async Task<OneOf<InstructionCreated, CreateInstructionFailed>> AddAsyncInstruction(CreateInstruction command)
         {
             _logger.LogTrace("Command Received: {Command}", command);
 
-            var result = await _accessor.AddAsyncInstruction(command, ForeignKeyID);
+            var result = await _accessor.AddAsyncInstruction(command);
 
             if (result.TryPickT1(out var failure, out var _))
             {
                 _logger.LogError("Failed to add item {Command}, got error: {ErrorMessage}", failure.Command, failure.Reason);
+            }
+
+            return result;
+        }
+
+        public async Task<OneOf<InstructionDeleted, DeleteInstructionFailed>> DeleteAsyncInstruction(DeleteInstruction command)
+        {
+            _logger.LogTrace("Command Received: {Command}", command);
+
+            var result = await _accessor.DeleteAsyncInstruction(command);
+
+            if (result.TryPickT1(out var failure, out var _))
+            {
+                _logger.LogError("Failed to delete item {Id}, got error: {ErrorMessage}", failure.Command.Id, failure.Reason);
+            }
+
+            return result;
+        }
+
+        public async Task<OneOf<InstructionUpdated, UpdateInstructionFailed>> UpdateAsyncInstruction(UpdateInstruction command)
+        {
+            _logger.LogTrace("Command Received: {Command}", command);
+
+            var result = await _accessor.UpdateAsyncInstruction(command);
+
+            if (result.TryPickT1(out var failure, out var _))
+            {
+                _logger.LogError("Failed to delete item {Id}, got error: {ErrorMessage}", failure.Command.Id, failure.Reason);
             }
 
             return result;

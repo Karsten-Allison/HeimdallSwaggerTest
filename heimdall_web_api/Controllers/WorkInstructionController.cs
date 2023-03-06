@@ -62,10 +62,10 @@ namespace heimdall_web_api.Controllers
         [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(InstructionCreated))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CreateInstructionFailed))]
-        public async Task<IActionResult> AddInstructions([FromRoute] int id, [FromBody] CreateInstruction command)
+        public async Task<IActionResult> AddInstructions([FromRoute] int id, [FromBody] CreateInstruction request)
         {
-
-            var result = await _logic.AddAsyncInstruction(command, id);
+            var command = request with { ForeignKeyId = id };
+            var result = await _logic.AddAsyncInstruction(command);
             return result.Match(
                 success => (IActionResult)Ok(success),
                 error => Problem(detail: error.Reason, title: "Failed to Add Work Instructions", type: error.GetType().Name)
@@ -84,6 +84,18 @@ namespace heimdall_web_api.Controllers
             );
         }
 
+        [HttpPut]
+        [Route("{id}/{id2}")]
+        public async Task<IActionResult> UpdateInstruction([FromRoute] int id, [FromRoute] int id2, [FromBody] UpdateInstruction request)
+        {
+            var command = request with { Id = id, InstructionID = id2 };
+            var result = await _logic.UpdateAsyncInstruction(command);
+            return result.Match(
+                success => (IActionResult)Ok(success),
+                error => Problem(detail: error.Reason, title: "Failed to Update Instruction", type: error.GetType().Name)
+            );
+        }
+
         [HttpDelete]
         [Route("{Id}")]
         public async Task<IActionResult> DeleteWorkInstruction([FromRoute] DeleteWorkInstruction command)
@@ -92,6 +104,18 @@ namespace heimdall_web_api.Controllers
             return result.Match(
                 success => (IActionResult)Ok(success),
                 notFound => NotFound(notFound)
+            );
+        }
+
+        [HttpDelete]
+        [Route("{id}/{id2}")]
+        public async Task<IActionResult> DeleteInstruction([FromRoute] int id, [FromRoute] int id2, [FromBody] DeleteInstruction request)
+        {
+            var command = request with { Id = id, InstructionID = id2 };
+            var result = await _logic.DeleteAsyncInstruction(command);
+            return result.Match(
+                success => (IActionResult)Ok(success),
+                error => Problem(detail: error.Reason, title: "Failed to Update Instruction", type: error.GetType().Name)
             );
         }
 
