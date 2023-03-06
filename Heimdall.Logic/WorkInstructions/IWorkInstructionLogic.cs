@@ -11,6 +11,8 @@ namespace Heimdall.Logic.WorkInstructions
     public interface IWorkInstructionLogic
     {
         Task<OneOf<WorkInstructionCreated, CreateWorkInstructionFailed>> AddAsync(CreateWorkInstruction command);
+
+        Task<OneOf<InstructionCreated, CreateInstructionFailed>> AddAsyncInstruction(CreateInstruction command, int ForeignKeyID);
         Task<OneOf<WorkInstructionDeleted, DeleteWorkInstructionFailed>> DeleteAsync(DeleteWorkInstruction command);
         Task<OneOf<WorkInstructionsRead, WorkInstructionNotFound>> GetAllAsync();
         Task<OneOf<WorkInstructionRead, WorkInstructionNotFound>> GetAsync(ReadWorkInstruction command);

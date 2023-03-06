@@ -17,8 +17,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<WorkInstructionDatabaseContext>(
-        //options => options.UseNpgsql(builder.Configuration.GetConnectionString("WI_db"))
-        options => options.UseInMemoryDatabase("DataDB")
+        options => options.UseNpgsql(builder.Configuration.GetConnectionString("WI_db"))
+        //options => options.UseInMemoryDatabase("DataDB")
     );
 
 var app = builder.Build();

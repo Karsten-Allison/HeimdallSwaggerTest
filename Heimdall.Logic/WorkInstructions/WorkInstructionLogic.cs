@@ -100,5 +100,19 @@ namespace Heimdall.Logic.WorkInstructions
 
             return result;
         }
+
+        public async Task<OneOf<InstructionCreated, CreateInstructionFailed>> AddAsyncInstruction(CreateInstruction command, int ForeignKeyID)
+        {
+            _logger.LogTrace("Command Received: {Command}", command);
+
+            var result = await _accessor.AddAsyncInstruction(command, ForeignKeyID);
+
+            if (result.TryPickT1(out var failure, out var _))
+            {
+                _logger.LogError("Failed to add item {Command}, got error: {ErrorMessage}", failure.Command, failure.Reason);
+            }
+
+            return result;
+        }
     }
 }

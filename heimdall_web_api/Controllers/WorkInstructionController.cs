@@ -58,12 +58,26 @@ namespace heimdall_web_api.Controllers
             );
         }
 
+        [HttpPost]
+        [Route("{id}")]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(InstructionCreated))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CreateInstructionFailed))]
+        public async Task<IActionResult> AddInstructions([FromRoute] int id, [FromBody] CreateInstruction command)
+        {
+
+            var result = await _logic.AddAsyncInstruction(command, id);
+            return result.Match(
+                success => (IActionResult)Ok(success),
+                error => Problem(detail: error.Reason, title: "Failed to Add Work Instructions", type: error.GetType().Name)
+            );
+        }
+
         [HttpPut]
         [Route("{id}")]
         public async Task<IActionResult> UpdateWorkInstruction([FromRoute] int id, [FromBody] UpdateWorkInstruction request)
         {
             var command = request with { Id = id };
-            var result = await _logic.UpdateAsync(request);
+            var result = await _logic.UpdateAsync(command);
             return result.Match(
                 success => (IActionResult)Ok(success),
                 error => Problem(detail: error.Reason, title: "Failed to Update Work Instructions", type: error.GetType().Name)

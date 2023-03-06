@@ -43,6 +43,27 @@ namespace Heimdall.Data.Accessors
             }
         }
 
+        public async Task<OneOf<InstructionCreated, CreateInstructionFailed>> AddAsyncInstruction(CreateInstruction command, int ForeignKeyID)
+        {
+            var Instruction = new Instruction()
+            {
+                InstructionText = command.InstructionText,
+                InstructionImage = command.InstructionImage,
+                InstructionCordinates = command.InstructionCordinates,
+                InstructionForeignKey = ForeignKeyID
+            };
+            try
+            {
+                _context.Instructions.Add(Instruction);
+                await _context.SaveChangesAsync();
+                return new InstructionCreated(Instruction);
+            }
+            catch (Exception ex)
+            {
+                return new CreateInstructionFailed(command, ex.Message);
+            }
+        }
+
         public async Task<OneOf<WorkInstructionDeleted, DeleteWorkInstructionFailed>> DeleteAsync(DeleteWorkInstruction command)
         {
             var workInstruction = await _context.WorkInstructions.FindAsync(command.Id);
