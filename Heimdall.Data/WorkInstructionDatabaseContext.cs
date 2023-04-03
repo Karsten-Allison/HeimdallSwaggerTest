@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using heimdall_web_api.Configs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Heimdall.Logic.WorkInstructions.Entities;
+using System.Reflection;
 
 namespace Heimdall.Data
 {
@@ -13,12 +14,16 @@ namespace Heimdall.Data
         public WorkInstructionDatabaseContext(DbContextOptions<WorkInstructionDatabaseContext> options) : base(options)
         {
         }
-        public DbSet<WorkInstructionSet> workInstructionSets { get; set; }
+
+        // RLP - use PascalCasing for entities. The word "Set" isn't needed to define a set.
+        public DbSet<WorkInstruction> WorkInstructions { get; set; }
+
+        public DbSet<Instruction> Instructions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            new WorkInstructionSetConfig().Configure(modelBuilder.Entity<WorkInstructionSet>());
-            //now using IEntityTypeConfiguration to setup data accsess in a organized way
+            // RLP - There way will load all configurations in the entire assembly without having to specify them individually.
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
     }
 }

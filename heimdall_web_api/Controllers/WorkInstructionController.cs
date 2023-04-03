@@ -2,95 +2,122 @@
 using Heimdall.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Heimdall.Logic.WorkInstructions.Commands;
+using Heimdall.Logic.WorkInstructions;
+using Heimdall.Logic.WorkInstructions.Events;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using OneOf.Types;
 
 namespace heimdall_web_api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class WorkInstructionController : Controller
+    public class WorkInstructionsController : Controller
     {
-        private readonly WorkInstructionDatabaseContext context;
+        private readonly IWorkInstructionLogic _logic;
 
-        public WorkInstructionController(WorkInstructionDatabaseContext context)
+        public WorkInstructionsController(IWorkInstructionLogic logic)
         {
-            this.context = context;
+            _logic = logic;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllWorkInstructionSets()
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(WorkInstructionRead))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(WorkInstructionNotFound))]
+        public async Task<IActionResult> GetAllWorkInstructions()
         {
-
-            return Ok(await context.workInstructionSets.ToListAsync());
-
+            var result = await _logic.GetAllAsync();
+            return result.Match(
+                read => (IActionResult)Ok(read),
+                notFound => NotFound(notFound)
+            );
         }
 
         [HttpGet]
-        [Route("{id}")]
-        public async Task<IActionResult> GetWorkInstructionSet([FromRoute] int id)
+        [Route("{Id}")] // RLP - has to be caps so it matches the object in the ReadWorkInstruction .
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(WorkInstructionRead))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(WorkInstructionNotFound))]
+        public async Task<IActionResult> GetWorkInstructions([FromRoute] ReadWorkInstruction command) // RLP - Entity framework is super smart.
         {
-            var workInSet = await context.workInstructionSets.FindAsync(id);
-
-            if(workInSet != null)
-            {               
-                return Ok(workInSet);
-            }
-
-            return NotFound();
+            var result = await _logic.GetAsync(command);
+            return result.Match(
+                read => (IActionResult)Ok(read),
+                notFound => NotFound(notFound)
+            );
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddWorkInstructionSets(AddWorkInstructionRequest addWorkInstructionRequest)
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(WorkInstructionCreated))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CreateWorkInstructionFailed))]
+        public async Task<IActionResult> AddWorkInstructions([FromBody] CreateWorkInstruction command)
         {
-            var workInstructionSet = new WorkInstructionSet()
-            {
-
-                Title = addWorkInstructionRequest.Title,
-                Description = addWorkInstructionRequest.Description,
-                InstructionObject = addWorkInstructionRequest.InstructionObject,
-            };
-
-            await context.workInstructionSets.AddAsync(workInstructionSet);
-            await context.SaveChangesAsync();
-
-            return Ok(workInstructionSet);
+            var result = await _logic.AddAsync(command);
+            return result.Match(
+                success => (IActionResult)Ok(success),
+                error => Problem(detail: error.Reason, title: "Failed to Add Work Instructions", type: error.GetType().Name)
+            );
         }
-        
+
+        [HttpPost]
+        [Route("{id}")]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(InstructionCreated))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CreateInstructionFailed))]
+        public async Task<IActionResult> AddInstructions([FromRoute] int id, [FromBody] CreateInstruction request)
+        {
+            var command = request with { ForeignKeyId = id };
+            var result = await _logic.AddAsyncInstruction(command);
+            return result.Match(
+                success => (IActionResult)Ok(success),
+                error => Problem(detail: error.Reason, title: "Failed to Add Work Instructions", type: error.GetType().Name)
+            );
+        }
+
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> UpdateInstructionSet([FromRoute] int id, UpdateWorkInstructionRequest updateWorkInstructionRequest)
+        public async Task<IActionResult> UpdateWorkInstruction([FromRoute] int id, [FromBody] UpdateWorkInstruction request)
         {
-            var workInSet = await context.workInstructionSets.FindAsync(id);
+            var command = request with { Id = id };
+            var result = await _logic.UpdateAsync(command);
+            return result.Match(
+                success => (IActionResult)Ok(success),
+                error => Problem(detail: error.Reason, title: "Failed to Update Work Instructions", type: error.GetType().Name)
+            );
+        }
 
-            if(workInSet != null)
-            {
-                workInSet.Title = updateWorkInstructionRequest.Title;
-                workInSet.Description = updateWorkInstructionRequest.Description;
-                workInSet.InstructionObject = updateWorkInstructionRequest.InstructionObject;
-
-                await context.SaveChangesAsync();
-
-                return Ok(workInSet);
-            }
-
-            return NotFound();
-
+        [HttpPut]
+        [Route("{id}/{id2}")]
+        public async Task<IActionResult> UpdateInstruction([FromRoute] int id, [FromRoute] int id2, [FromBody] UpdateInstruction request)
+        {
+            var command = request with { Id = id, InstructionID = id2 };
+            var result = await _logic.UpdateAsyncInstruction(command);
+            return result.Match(
+                success => (IActionResult)Ok(success),
+                error => Problem(detail: error.Reason, title: "Failed to Update Instruction", type: error.GetType().Name)
+            );
         }
 
         [HttpDelete]
-        [Route("{id}")]
-        public async Task<IActionResult> DeleteWorkInstructionSet(int id)
+        [Route("{Id}")]
+        public async Task<IActionResult> DeleteWorkInstruction([FromRoute] DeleteWorkInstruction command)
         {
-            var workInSet = await context.workInstructionSets.FindAsync(id);
-
-            if (workInSet != null)
-            {
-                context.Remove(workInSet);
-                await context.SaveChangesAsync();
-                return Ok(workInSet);
-            }
-
-            return NotFound();
+            var result = await _logic.DeleteAsync(command);
+            return result.Match(
+                success => (IActionResult)Ok(success),
+                notFound => NotFound(notFound)
+            );
         }
-        
+
+        [HttpDelete]
+        [Route("{id}/{id2}")]
+        public async Task<IActionResult> DeleteInstruction([FromRoute] int id, [FromRoute] int id2, [FromBody] DeleteInstruction request)
+        {
+            var command = request with { Id = id, InstructionID = id2 };
+            var result = await _logic.DeleteAsyncInstruction(command);
+            return result.Match(
+                success => (IActionResult)Ok(success),
+                error => Problem(detail: error.Reason, title: "Failed to Update Instruction", type: error.GetType().Name)
+            );
+        }
+
     }
 }
