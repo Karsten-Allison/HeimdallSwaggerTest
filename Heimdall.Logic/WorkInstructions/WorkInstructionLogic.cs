@@ -184,5 +184,47 @@ namespace Heimdall.Logic.WorkInstructions
 
             return result;
         }
+
+        public async Task<OneOf<InstructionItemUpdated, UpdateInstructionItemFailed>> UpdateAsyncInstructionItem(UpdateInstructionItem command)
+        {
+            _logger.LogTrace("Command Received: {Command}", command);
+
+            var result = await _accessor.UpdateAsyncInstructionItem(command);
+
+            if (result.TryPickT1(out var failure, out var _))
+            {
+                _logger.LogError("Failed to delete item {Id}, Instruction ID: {Id2}, got error: {ErrorMessage}", failure.Command.ItemId, failure.Command.InstructionId, failure.Reason);
+            }
+
+            return result;
+        }
+
+        public async Task<OneOf<ItemUpdated, UpdateItemFailed>> UpdateAsyncItem(UpdateItem command)
+        {
+            _logger.LogTrace("Command Received: {Command}", command);
+
+            var result = await _accessor.UpdateAsyncItem(command);
+
+            if (result.TryPickT1(out var failure, out var _))
+            {
+                _logger.LogError("Failed to update item {Id}, got error: {ErrorMessage}", failure.Command.Id, failure.Reason);
+            }
+
+            return result;
+        }
+
+        public async Task<OneOf<ItemDeleted, DeleteItemFailed>> DeleteAsyncItem(DeleteItem command)
+        {
+            _logger.LogTrace("Command Received: {Command}", command);
+
+            var result = await _accessor.DeleteAsyncItem(command);
+
+            if (result.TryPickT1(out var failure, out var _))
+            {
+                _logger.LogError("Failed to delete item {Id}, got error: {ErrorMessage}", failure.Command.Id, failure.Reason);
+            }
+
+            return result;
+        }
     }
 }

@@ -108,6 +108,18 @@ namespace heimdall_web_api.Controllers
         }
 
         [HttpPut]
+        [Route("item/{id}")]
+        public async Task<IActionResult> DeleteItem([FromRoute] int id, [FromBody] UpdateItem request)
+        {
+            var command = request with { Id = id };
+            var result = await _logic.UpdateAsyncItem(command);
+            return result.Match(
+                success => (IActionResult)Ok(success),
+                notFound => NotFound(notFound)
+            );
+        }
+
+        [HttpPut]
         [Route("{id}/instruction/{id2}")]
         public async Task<IActionResult> UpdateInstruction([FromRoute] int id, [FromRoute] int id2, [FromBody] UpdateInstruction request)
         {
@@ -119,11 +131,34 @@ namespace heimdall_web_api.Controllers
             );
         }
 
+        [HttpPut]
+        [Route("instruction/{id}/item/{id2}")]
+        public async Task<IActionResult> UpdateInstructionItem([FromRoute] int id, [FromRoute] int id2, [FromBody] UpdateInstructionItem request)
+        {
+            var command = request with { InstructionId = id, ItemId = id2 };
+            var result = await _logic.UpdateAsyncInstructionItem(command);
+            return result.Match(
+                success => (IActionResult)Ok(success),
+                error => Problem(detail: error.Reason, title: "Failed to Add Instruction Item", type: error.GetType().Name)
+            );
+        }
+
         [HttpDelete]
         [Route("{Id}")]
         public async Task<IActionResult> DeleteWorkInstruction([FromRoute] DeleteWorkInstruction command)
         {
             var result = await _logic.DeleteAsync(command);
+            return result.Match(
+                success => (IActionResult)Ok(success),
+                notFound => NotFound(notFound)
+            );
+        }
+
+        [HttpDelete]
+        [Route("item/{Id}")]
+        public async Task<IActionResult> DeleteItem([FromRoute] DeleteItem command)
+        {
+            var result = await _logic.DeleteAsyncItem(command);
             return result.Match(
                 success => (IActionResult)Ok(success),
                 notFound => NotFound(notFound)

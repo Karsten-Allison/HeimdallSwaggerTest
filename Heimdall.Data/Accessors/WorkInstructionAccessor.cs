@@ -270,5 +270,61 @@ namespace Heimdall.Data.Accessors
                 return new CreateInstructionItemFailed(command, ex.Message);
             }
         }
+
+        public async Task<OneOf<InstructionItemUpdated, UpdateInstructionItemFailed>> UpdateAsyncInstructionItem(UpdateInstructionItem command)
+        {
+            //var workInSet = await _context.WorkInstructions.FindAsync(command.Id);
+
+            var InstructionItem = await _context.InstructionItems.FindAsync(command.InstructionId, command.ItemId);
+
+            if (InstructionItem is null)
+            {
+                return new UpdateInstructionItemFailed(command, $"Could not find instruction item with id {command.InstructionId}, item id {command.ItemId}");
+            }
+
+            if(command.ItemQuantity is not null)
+            {
+                InstructionItem.ItemQuantity = (double)command.ItemQuantity;
+
+            }
+     
+            await _context.SaveChangesAsync();
+
+            return new InstructionItemUpdated(InstructionItem);
+        }
+
+        public async Task<OneOf<ItemUpdated, UpdateItemFailed>> UpdateAsyncItem(UpdateItem command)
+        {
+            var Item = await _context.Items.FindAsync(command.Id);
+
+            if (Item is null)
+            {
+                return new UpdateItemFailed(command, $"Could not find item with id {command.Id}");
+            }
+
+            if(command.Name is not null)
+            {
+                Item.Name = command.Name;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return new ItemUpdated(Item);
+        }
+
+        public async Task<OneOf<ItemDeleted, DeleteItemFailed>> DeleteAsyncItem(DeleteItem command)
+        {
+            var Item = await _context.Items.FindAsync(command.Id);
+
+            if (Item is null)
+            {
+                return new DeleteItemFailed(command, $"Could not find work instruction with id {command.Id}");
+            }
+
+            _context.Remove(Item);
+            await _context.SaveChangesAsync();
+
+            return new ItemDeleted(command.Id);
+        }
     }
 }
