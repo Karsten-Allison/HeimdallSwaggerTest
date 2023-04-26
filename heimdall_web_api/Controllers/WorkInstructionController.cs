@@ -1,5 +1,4 @@
-﻿using heimdall_web_api.Models;
-using Heimdall.Data;
+﻿using Heimdall.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Heimdall.Logic.WorkInstructions.Commands;
@@ -7,6 +6,7 @@ using Heimdall.Logic.WorkInstructions;
 using Heimdall.Logic.WorkInstructions.Events;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using OneOf.Types;
+using OneOf;
 
 namespace heimdall_web_api.Controllers
 {
@@ -59,6 +59,17 @@ namespace heimdall_web_api.Controllers
         }
 
         [HttpPost]
+        [Route("item/")]
+        public async Task<IActionResult> AddItem([FromBody] CreateItem command)
+        {
+            var result = await _logic.AddAsyncItem(command);
+            return result.Match(
+                success => (IActionResult)Ok(success),
+                error => Problem(detail: error.Reason, title: "Failed to Add Work Instructions", type: error.GetType().Name)
+            );
+        }
+
+        [HttpPost]
         [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(InstructionCreated))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CreateInstructionFailed))]
@@ -69,6 +80,18 @@ namespace heimdall_web_api.Controllers
             return result.Match(
                 success => (IActionResult)Ok(success),
                 error => Problem(detail: error.Reason, title: "Failed to Add Work Instructions", type: error.GetType().Name)
+            );
+        }
+
+        [HttpPost]
+        [Route("instruction/{id2}")]
+        public async Task<IActionResult> AddInstructionItem([FromRoute] int id2, [FromBody] CreateInstructionItem request)
+        {
+            var command = request with {InstructionId = id2};
+            var result = await _logic.AddAsyncInstructionItem(command);
+            return result.Match(
+                success => (IActionResult)Ok(success),
+                error => Problem(detail: error.Reason, title: "Failed to Add Instruction Item", type: error.GetType().Name)
             );
         }
 
@@ -85,7 +108,7 @@ namespace heimdall_web_api.Controllers
         }
 
         [HttpPut]
-        [Route("{id}/{id2}")]
+        [Route("{id}/instruction/{id2}")]
         public async Task<IActionResult> UpdateInstruction([FromRoute] int id, [FromRoute] int id2, [FromBody] UpdateInstruction request)
         {
             var command = request with { Id = id, InstructionID = id2 };
@@ -108,7 +131,19 @@ namespace heimdall_web_api.Controllers
         }
 
         [HttpDelete]
-        [Route("{id}/{id2}")]
+        [Route("instruction/{id}/item/{id2}")]
+        public async Task<IActionResult> DeleteInstructionItem([FromRoute] int id, [FromRoute] int id2, [FromBody] DeleteInstructionItem request)
+        {
+            var command = request with {InstructionId = id, ItemId = id2 };
+            var result = await _logic.DeleteAsyncInstructionItem(command);
+            return result.Match(
+                success => (IActionResult)Ok(success),
+                error => Problem(detail: error.Reason, title: "Failed to Add Instruction Item", type: error.GetType().Name)
+            );
+        }
+
+        [HttpDelete]
+        [Route("{id}/instruction/{id2}")]
         public async Task<IActionResult> DeleteInstruction([FromRoute] int id, [FromRoute] int id2, [FromBody] DeleteInstruction request)
         {
             var command = request with { Id = id, InstructionID = id2 };

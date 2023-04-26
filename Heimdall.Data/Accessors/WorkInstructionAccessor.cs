@@ -43,6 +43,25 @@ namespace Heimdall.Data.Accessors
             }
         }
 
+        public async Task<OneOf<ItemCreated, CreateItemFailed>> AddAsyncItem(CreateItem command)
+        {
+            var item = new Item()
+            {
+                Name = command.Name,
+            };
+            try
+            {
+                _context.Items.Add(item);
+                await _context.SaveChangesAsync();
+                return new ItemCreated(item);
+            }
+            catch (Exception ex)
+            {
+                return new CreateItemFailed(command, ex.Message);
+            }
+        }
+
+
         public async Task<OneOf<InstructionCreated, CreateInstructionFailed>> AddAsyncInstruction(CreateInstruction command)
         {
             var Instruction = new Instruction()
@@ -50,7 +69,8 @@ namespace Heimdall.Data.Accessors
                 InstructionText = command.InstructionText,
                 InstructionImage = command.InstructionImage,
                 InstructionCordinates = command.InstructionCordinates,
-                InstructionForeignKey = command.ForeignKeyId
+                InstructionForeignKey = command.ForeignKeyId,
+                ItemList = command.InstructionItems
             };
             try
             {
@@ -104,8 +124,19 @@ namespace Heimdall.Data.Accessors
         public async Task<OneOf<WorkInstructionsRead, WorkInstructionNotFound>> GetAllAsync()
         {
             WorkInstruction[] databaseInstructions = (await _context.WorkInstructions
-                .Include(workinstruction => workinstruction.InstructionList).ToArrayAsync()) ?? Array.Empty<WorkInstruction>();
-            
+                .Include(workinstruction => workinstruction.InstructionList)
+                .ThenInclude(i => i.ItemList)
+                .ToArrayAsync()) ?? Array.Empty<WorkInstruction>();
+
+            foreach (var instruction in databaseInstructions.SelectMany(wi => wi.InstructionList))
+            {
+                foreach (var instructionItem in instruction.ItemList)
+                {
+                    Item item = await _context.Items.FirstOrDefaultAsync(i => i.Id == instructionItem.ItemId);
+                    instructionItem.Item = item;
+                }
+            }
+
             return new WorkInstructionsRead(databaseInstructions);
         }
 
@@ -113,7 +144,21 @@ namespace Heimdall.Data.Accessors
         {
             WorkInstruction? workInstruction = await _context.WorkInstructions
                 .Include(workinstruction => workinstruction.InstructionList)
+                .ThenInclude(i => i.ItemList)
                 .FirstOrDefaultAsync(workinstruction => workinstruction.Id == command.Id);
+
+            // Get the item for each instruction item using the ItemId foreign key
+            foreach (var instruction in workInstruction?.InstructionList ?? Enumerable.Empty<Instruction>())
+            {
+                foreach (var instructionItem in instruction.ItemList ?? Enumerable.Empty<InstructionItem>())
+                {
+                    // Query the Items DbSet to get the item by its ItemId foreign key
+                    Item item = await _context.Items.FirstOrDefaultAsync(i => i.Id == instructionItem.ItemId);
+
+                    instructionItem.Item = item;
+                }
+            }
+
 
             if (workInstruction is null)
             {
@@ -180,12 +225,50 @@ namespace Heimdall.Data.Accessors
             {
                 Instruction.InstructionCordinates = command.InstructionCordinates;
             }
-
+            if(command.InstructionItems is not null)
+            {
+                Instruction.ItemList = command.InstructionItems;
+            }
 
             await _context.SaveChangesAsync();
 
             return new InstructionUpdated(Instruction);
         }
 
+        public async Task<OneOf<InstructionItemDeleted, DeleteInstructionItemFailed>> DeleteAsyncInstructionItem(DeleteInstructionItem command)
+        {
+            var InstructionItem = await _context.InstructionItems.FindAsync(command.InstructionId, command.ItemId);
+
+            if (InstructionItem is null)
+            {
+                return new DeleteInstructionItemFailed(command, $"Could not find work instruction with id {command.InstructionId}, ItemID {command.ItemId}");
+            }
+
+            _context.Remove(InstructionItem);
+            await _context.SaveChangesAsync();
+
+            return new InstructionItemDeleted(command.ItemId, command.InstructionId);
+        }
+
+        public async Task<OneOf<InstructionItemCreated, CreateInstructionItemFailed>> AddAsyncInstructionItem(CreateInstructionItem command)
+        {
+            var InstructionItem = new InstructionItem()
+            {
+                ItemId = command.ItemId,
+                InstructionId = command.InstructionId,
+                ItemQuantity = (double)command.ItemQuantity,
+                Item = command.Item,
+            };
+            try
+            {
+                _context.InstructionItems.Add(InstructionItem);
+                await _context.SaveChangesAsync();
+                return new InstructionItemCreated(InstructionItem);
+            }
+            catch (Exception ex)
+            {
+                return new CreateInstructionItemFailed(command, ex.Message);
+            }
+        }
     }
 }

@@ -34,5 +34,14 @@ namespace Heimdall.Logic.WorkInstructions
         Task<OneOf<InstructionCreated, CreateInstructionFailed>> AddAsyncInstruction(CreateInstruction command);
 
         Task<OneOf<InstructionUpdated, UpdateInstructionFailed>> UpdateAsyncInstruction(UpdateInstruction command);
+
+        // For Items
+        Task<OneOf<ItemCreated, CreateItemFailed>> AddAsyncItem(CreateItem command);
+
+        // For InstructionItems
+
+        Task<OneOf<InstructionItemDeleted, DeleteInstructionItemFailed>> DeleteAsyncInstructionItem(DeleteInstructionItem command);
+
+        Task<OneOf<InstructionItemCreated, CreateInstructionItemFailed>> AddAsyncInstructionItem(CreateInstructionItem command);
     }
 }

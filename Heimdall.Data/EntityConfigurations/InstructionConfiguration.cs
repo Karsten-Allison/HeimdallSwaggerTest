@@ -29,8 +29,7 @@ namespace Heimdall.Data.EntityConfigurations
                 .WithMany(x => x.InstructionList)
                 .HasForeignKey(x => x.InstructionForeignKey)
                 .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade); 
-                
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

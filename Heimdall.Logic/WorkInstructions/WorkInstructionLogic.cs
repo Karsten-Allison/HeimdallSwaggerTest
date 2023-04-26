@@ -142,5 +142,47 @@ namespace Heimdall.Logic.WorkInstructions
 
             return result;
         }
+
+        public async Task<OneOf<ItemCreated, CreateItemFailed>> AddAsyncItem(CreateItem command)
+        {
+            _logger.LogTrace("Command Received: {Command}", command);
+
+            var result = await _accessor.AddAsyncItem(command);
+
+            if (result.TryPickT1(out var failure, out var _))
+            {
+                _logger.LogError("Failed to add item {Command}, got error: {ErrorMessage}", failure.Command, failure.Reason);
+            }
+
+            return result;
+        }
+
+        public async Task<OneOf<InstructionItemDeleted, DeleteInstructionItemFailed>> DeleteAsyncInstructionItem(DeleteInstructionItem command)
+        {
+            _logger.LogTrace("Command Received: {Command}", command);
+
+            var result = await _accessor.DeleteAsyncInstructionItem(command);
+
+            if (result.TryPickT1(out var failure, out var _))
+            {
+                _logger.LogError("Failed to delete item {Id}, Instruction ID: {Id2}, got error: {ErrorMessage}", failure.Command.ItemId, failure.Command.InstructionId, failure.Reason);
+            }
+
+            return result;
+        }
+
+        public async Task<OneOf<InstructionItemCreated, CreateInstructionItemFailed>> AddAsyncInstructionItem(CreateInstructionItem command)
+        {
+            _logger.LogTrace("Command Received: {Command}", command);
+
+            var result = await _accessor.AddAsyncInstructionItem(command);
+
+            if (result.TryPickT1(out var failure, out var _))
+            {
+                _logger.LogError("Failed to add item {Command}, got error: {ErrorMessage}", failure.Command, failure.Reason);
+            }
+
+            return result;
+        }
     }
 }

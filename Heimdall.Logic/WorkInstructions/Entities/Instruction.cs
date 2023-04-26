@@ -19,13 +19,9 @@ namespace Heimdall.Logic.WorkInstructions.Entities
         public string InstructionCordinates { get; set; } = string.Empty;
         // Instruction "cordinates", potentially a sort of ([x,y,xsize,ysize] scaled to 0-1 ) sort of thing
 
+        public ICollection<InstructionItem>? ItemList { get; set; }
+
         //------------------------
         public int InstructionForeignKey { get; set; } 
-
-        // public WorkInstruction RelatedWorkInstruction { get; set; }
-        // This broke the CreateWorkInstruction when paired with 
-
-      
-
     }
 }

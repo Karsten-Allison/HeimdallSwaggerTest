@@ -20,6 +20,10 @@ namespace Heimdall.Data
 
         public DbSet<Instruction> Instructions { get; set; }
 
+        public DbSet<InstructionItem> InstructionItems { get; set; }
+
+        public DbSet<Item> Items { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // RLP - There way will load all configurations in the entire assembly without having to specify them individually.

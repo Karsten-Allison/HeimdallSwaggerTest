@@ -14,5 +14,5 @@ namespace Heimdall.Logic.WorkInstructions.Commands
     /// <param name="InstructionText"></param>
     /// <param name="InstructionImage"></param>
     /// <param name="InstructionCordinates"></param>
-    public record UpdateInstruction(int Id, int InstructionID, string? InstructionText, string? InstructionImage, string? InstructionCordinates) : ICommand;
+    public record UpdateInstruction(int Id, int InstructionID, string? InstructionText, string? InstructionImage, string? InstructionCordinates, List<InstructionItem>? InstructionItems) : ICommand;
 }

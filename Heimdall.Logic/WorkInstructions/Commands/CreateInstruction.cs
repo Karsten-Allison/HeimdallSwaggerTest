@@ -15,5 +15,5 @@ namespace Heimdall.Logic.WorkInstructions.Commands
     /// <param name="InstructionImage"></param>
     /// <param name="InstructionCordinates"></param>
     /// <param name="ForeignKeyId"></param>
-    public record CreateInstruction(string InstructionText, string InstructionImage, string InstructionCordinates, int ForeignKeyId) : ICommand;
+    public record CreateInstruction(string? InstructionText, string? InstructionImage, double? ItemQuantity, string InstructionCordinates, int ForeignKeyId, List<InstructionItem>? InstructionItems) : ICommand;
 }
